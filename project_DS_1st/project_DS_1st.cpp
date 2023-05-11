@@ -7,43 +7,45 @@ using namespace std;
 
 
 
-
 class Node {
 private:
 	friend class Stack;
+
 	string value;
 	int type;
-
 	Node* dlink;
 	Node* next;
-	
+
 public:
-	
+	//Constructores------
 	Node(string title, int inputType) {
-		dlink = NULL;
-		next = NULL;
-		value = title;
-		type = inputType;
+		this->dlink = NULL;
+		this->next = NULL;
+		this->value = title;
+		this->type = inputType;
 	}
 	Node(string inputTitle, int inputType, Node* inputDlink, Node* inputNext) {
-		value = inputTitle;
-		type = inputType;
-		dlink = inputDlink;
-		next = inputNext;
+		this->value = inputTitle;
+		this->type = inputType;
+		this->dlink = inputDlink;
+		this->next = inputNext;
 	}
+	//GETER functions------
+	int getType() { return this->type;  }
+	string getValue() { return this->value;}
+	Node* getDLink() { return this->dlink; }
+	Node* getNext() { return this->next; }
+	//SETER functions------
 	void setNext(Node* node) { this->next = node; }
-	bool isAnyDLink() { 
+	void setDLink(Node* node) { this->dlink = node; }
+	//general methods------
+	bool isAnyDLink() {
 		if (dlink == NULL) return false;
 		else
 			return true;
-		
+
 	}
-	Node* getDLink() { return this -> dlink; }
-	Node* getNext() { return this -> next; }
-	void setDLink(Node* node) { this->dlink = node; }
-
 };
-
 class Stack {
 private:
 	int size;
@@ -56,7 +58,11 @@ public:
 		this->top = NULL;
 		this->firstNode = NULL;
 	};
+	
+	//GETER functions -------
 	int getSize() { return size; }
+	Node* getFirst() { return firstNode;  }
+	
 	//Add methods --> each node type have thier own add method 
 	void _addHeadToStack(Node* head) {
 		if (size == 0) {
@@ -70,12 +76,10 @@ public:
 			this->top = head;
 			this->size++;
 		}
-
 	}
-
 	void _addPropertyToStack(Node* prop) {
 		// if this is the first property 
-		if (!this->top->dlink == NULL) {
+		if (this->top->dlink == NULL) {
 			this->top->setDLink(prop);
 		}
 		else // if this node is not the first property for this head node
@@ -83,10 +87,7 @@ public:
 			prop->setNext(top->getDLink());
 			top->setDLink(prop);
 		}
-
-
 	}
-
 	void _addDataToStack(Node* data) {
 		if(this->top->dlink->dlink == NULL )
 		{
@@ -100,9 +101,7 @@ public:
 	
 	}
 };
-
-
-// global list var here
+// global list var here-----------------------------
 Stack GlobalList = Stack();
 string FilePath = "C:\\code\\cpp\\project_DS_1st\\ex.txt";
 
@@ -120,24 +119,14 @@ int actionDetectorFUNC(string line) {
 	else if(actionType == "data"){ return 2; }
 
 }
-
 string titleDetectorFUNC(string line) {
 	size_t pos = line.find(":");
 	if (pos == std::string::npos) { return ""; }
 	return line.substr(pos + 2);
 }
-
-void filller() {
+//Features-----------------------------------------------------------
+void _filler() {
 	// filler function --> fill the global list with  data in file 
-
-	// open file 
-
-	//access to line 
-
-	// store aaction  // store value >> himed reza rohi 
-
-	// switch on action 
-
 	ifstream _File;
 	_File.open(FilePath);
 	string _currentLine; 
@@ -157,26 +146,42 @@ void filller() {
 		}
 		
 	}
-		
+}
 
 
 
+void _printerAll(Node* list) {
+	//priter function --> print all the elements in global list with specefic form . 
+	Node* inc = list;
+	string value = inc->getValue();
+	while (inc != NULL) {
+		if (inc->getType()==0){
+			cout << " - contact : " << value << endl;
+			_printerAll(inc->getDLink());
+		}
+		else if (inc->getType()==1){
+			cout << " - property : " << value << endl;
+			_printerAll(inc->getDLink());
+		}
+		else if (inc->getType()==2){
+			if (inc->next() != NULL) {
+				cout << " - data : " << value << endl;
+				_printerAll(inc->getNext());
+			}
+			else
+			{
+				
+			}
 
-
-
-
-
-
-
-
-
+			
+		}
+	}
 	
 }
-//
+
 
 int main() {
+	_filler();
+	_printerAll(GlobalList.getFirst());
 
-	
-
-	
 }
