@@ -158,20 +158,19 @@ void _printerAll(Node* list) {
 		if (inc->getType()==0){
 			cout << " - contact : " << value << endl;
 			_printerAll(inc->getDLink());
+			_printerAll(inc->getNext());
+
 		}
 		else if (inc->getType()==1){
 			cout << " - property : " << value << endl;
 			_printerAll(inc->getDLink());
+			_printerAll(inc->getNext());
 		}
 		else if (inc->getType()==2){
-			if (inc->next() != NULL) {
 				cout << " - data : " << value << endl;
 				_printerAll(inc->getNext());
-			}
-			else
-			{
-				
-			}
+			
+			
 
 			
 		}
