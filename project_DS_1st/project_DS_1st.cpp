@@ -31,8 +31,8 @@ public:
 		this->next = inputNext;
 	}
 	//GETER functions------
-	int getType() { return this->type;  }
-	string getValue() { return this->value;}
+	int getType() { return this->type; }
+	string getValue() { return this->value; }
 	Node* getDLink() { return this->dlink; }
 	Node* getNext() { return this->next; }
 	//SETER functions------
@@ -58,11 +58,11 @@ public:
 		this->top = NULL;
 		this->firstNode = NULL;
 	};
-	
+
 	//GETER functions -------
 	int getSize() { return size; }
-	Node* getFirst() { return firstNode;  }
-	
+	Node* getFirst() { return firstNode; }
+
 	//Add methods --> each node type have thier own add method 
 	void _addHeadToStack(Node* head) {
 		if (size == 0) {
@@ -89,16 +89,16 @@ public:
 		}
 	}
 	void _addDataToStack(Node* data) {
-		if(this->top->dlink->dlink == NULL )
+		if (this->top->dlink->dlink == NULL)
 		{
-			this->top->dlink->dlink = data; 
+			this->top->dlink->dlink = data;
 		}
 		else
 		{
 			data->next = this->top->dlink->dlink;
 			this->top->dlink->dlink = data;
 		}
-	
+
 	}
 };
 // global list var here-----------------------------
@@ -108,15 +108,15 @@ string FilePath = "C:\\code\\cpp\\project_DS_1st\\ex.txt";
 //tools functions --------------------------------------------------------------------------
 int actionDetectorFUNC(string line) {
 	//action detector finction -- > detect type of node in given sentece by file 
-	string dash; 
-	string actionType; 
+	string dash;
+	string actionType;
 	istringstream iss;
 	iss.str(line);
 	iss >> dash;
 	iss >> actionType;
 	if (actionType == "contact") { return 0; }
-	else if(actionType == "property"){ return 1; }
-	else if(actionType == "data"){ return 2; }
+	else if (actionType == "property") { return 1; }
+	else if (actionType == "data") { return 2; }
 
 }
 string titleDetectorFUNC(string line) {
@@ -129,56 +129,48 @@ void _filler() {
 	// filler function --> fill the global list with  data in file 
 	ifstream _File;
 	_File.open(FilePath);
-	string _currentLine; 
-	
+	string _currentLine;
+
 	while (getline(_File, _currentLine)) {
 		int lineAction = actionDetectorFUNC(_currentLine);
 		string lineTitle = titleDetectorFUNC(_currentLine);
-		Node* instance =  new Node(lineTitle , lineAction);
+		Node* instance = new Node(lineTitle, lineAction);
 		switch (lineAction)
 		{
-			case 0:
-				GlobalList._addHeadToStack(instance); break;
-			
-			case 1: GlobalList._addPropertyToStack(instance); break;
+		case 0:
+			GlobalList._addHeadToStack(instance); break;
 
-			case 2:GlobalList._addDataToStack(instance); break;
+		case 1: GlobalList._addPropertyToStack(instance); break;
+
+		case 2:GlobalList._addDataToStack(instance); break;
 		}
-		
+
 	}
 }
-
-
 
 void _printerAll(Node* list) {
 	//priter function --> print all the elements in global list with specefic form . 
 	Node* inc = list;
 	string value = inc->getValue();
-	while (inc != NULL) {
-		if (inc->getType()==0){
+	if (inc != NULL) {
+		if (inc->getType() == 0) {
 			cout << " - contact : " << value << endl;
 			_printerAll(inc->getDLink());
-			_printerAll(inc->getNext());
-
 		}
-		else if (inc->getType()==1){
+		else if (inc->getType() == 1) {
 			cout << " - property : " << value << endl;
 			_printerAll(inc->getDLink());
-			_printerAll(inc->getNext());
 		}
-		else if (inc->getType()==2){
-				cout << " - data : " << value << endl;
-				_printerAll(inc->getNext());
-			
-			
-
-			
+		else if (inc->getType() == 2) {
+			cout << " - data : " << value << endl;
 		}
 	}
-	
+	if (inc->getNext()) {
+		_printerAll(inc->getNext());
+	}
 }
 
-
+//-------------------------------------
 int main() {
 	_filler();
 	_printerAll(GlobalList.getFirst());
