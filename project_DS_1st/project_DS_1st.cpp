@@ -1,3 +1,5 @@
+
+
 #include<iostream>
 #include<fstream>
 #include<string>
@@ -38,6 +40,15 @@ public:
 	//SETER functions------
 	void setNext(Node* node) { this->next = node; }
 	void setDLink(Node* node) { this->dlink = node; }
+	void setLastDLink(Node* node, string val, int typ) {
+		Node* inc = new Node(val, typ);
+		Node* tmp = node->dlink;
+		if (tmp) {
+			setLastDLink(tmp, val, typ);
+		}
+		else
+			this->dlink = inc;
+	}
 	//general methods------
 	bool isAnyDLink() {
 		if (dlink == NULL) return false;
@@ -62,6 +73,11 @@ public:
 	//GETER functions -------
 	int getSize() { return size; }
 	Node* getFirst() { return firstNode; }
+
+	//SETER methods ----------
+	void deleteList() {
+		this->firstNode = NULL;
+	}
 
 	//Add methods --> each node type have thier own add method 
 	void _addHeadToStack(Node* head) {
@@ -124,6 +140,10 @@ string titleDetectorFUNC(string line) {
 	if (pos == std::string::npos) { return ""; }
 	return line.substr(pos + 2);
 }
+void addMethodMenu() {
+	cout << "\n\t\tchoose add option  \n\n\n\t1-add New property\n\n\t2-add to Existing Property\n";
+
+}
 //Features-----------------------------------------------------------
 void _filler() {
 	// filler function --> fill the global list with  data in file 
@@ -148,7 +168,12 @@ void _filler() {
 	}
 }
 
-void _printerAll(Node* list) {
+int _printerAll(Node* list) {
+	if (list == NULL)
+	{
+		cout << "\nEnd of list ...\n ";
+		return 0;
+	}
 	//priter function --> print all the elements in global list with specefic form . 
 	Node* inc = list;
 	string value = inc->getValue();
@@ -168,11 +193,161 @@ void _printerAll(Node* list) {
 	if (inc->getNext()) {
 		_printerAll(inc->getNext());
 	}
+
+}
+
+void _deleteAll() {
+	// deleteAll Function --> delete the whole list 
+	GlobalList.deleteList();
+}
+
+void _Addcontact() {
+	//addContact Function ---> creat a single contact with single property and data . 
+	// warning --> user can not enter empty value for any items ...
+
+
+	string Namevalue, propertyValue, dataValue;
+	do {
+		cout << "enter name for contact : ";
+		getline(cin, Namevalue);
+		cout << "add a property title  : ";
+		getline(cin, propertyValue);
+		cout << "add a data for " << propertyValue << " : ";
+		getline(cin, dataValue);
+
+	} while (Namevalue == "" || propertyValue == "" || dataValue == "");
+	Node* newData = new Node(dataValue, 2);
+	Node* newProperty = new Node(propertyValue, 1, newData, NULL);
+	Node* newContact = new Node(Namevalue, 0, newProperty, NULL);
+
+	GlobalList._addHeadToStack(newContact);
+
+	cout << "\ncontact create successfully ... " << Namevalue << "\n\n";
+
+
+	// need  function to save list to file ... 
+
+}
+
+void _addPropertyOnly() {
+	//addPropertyOnly Function ---> for adding property whether its data type or its property we use this function.
+	Node* instance = GlobalList.getFirst();
+	string name;
+	bool flag = false;
+	do {
+		cout << "\n enter contact name for adding property : ";
+		getline(cin, name);
+		if (name == "EXT")exit(1);
+		while (instance)
+		{
+			if (instance->getValue() == name)
+			{
+				flag = true;
+				break;
+
+			}
+			else
+				instance = instance->getNext();
+		}
+		if (!flag) { cout << "\nname dosent exist--- try again\n type EXT for cancel adding property ....\n "; }
+
+	} while (!flag);
+	// moving global instance to the right contact index ^ 
+
+	int methodType; //this varable is selcecting add method  1-new property 2-add in existing property 
+	addMethodMenu();
+	cin >> methodType;
+	switch (methodType)
+	{
+	case 1: {
+		bool isFisrtProp = true;
+		string valueOfProperty;
+		int typeOfProperty = 1;
+		cout << "\nadding fisrt property...\n\n ";
+		do {
+			string valueOfProperty;
+			int typeOfProperty;
+
+			if (!isFisrtProp) {// first option have to be a property type ! cuz its new for contact 
+				cout << "\n\t1-add Property :\n\n\t2-add Data : \n";
+				cin >> typeOfProperty;
+			}
+			isFisrtProp = false;
+			cout << "\n\t title : ";
+			cin >> typeOfProperty;
+			//add with built in method 
+			instance->setLastDLink(instance, valueOfProperty, typeOfProperty);
+			cout << "\n\n_________________proccess finished_________________________\n\n";
+
+		} while (typeOfProperty == 2);
+
+
+	}; break;
+	case 2: {};
+	default: {
+		system("color 41");
+		cout << "item not found ....";
+		exit(1);
+	};
+		   break;
+	}
+
+
+	// save file func
+
+
+}
+
+int _deleteFromFile() {
+	fstream ofs;
+	ofs.open(FilePath, ios::out | ios::trunc);
+	ofs.close();
+	return 0;
+}
+
+// update file 
+int _updateFile(Node* list) {
+	//ofstream openfile(FilePath, ios::app);
+
+	if (list == NULL)
+	{
+		cout << "\nEnd of list ...\n ";
+		return 0;
+	}
+	//priter function --> print all the elements in global list with specefic form . 
+	Node* inc = list;
+	string value = inc->getValue();
+	if (inc != NULL) {
+		if (inc->getType() == 0) {
+			ofstream openfile(FilePath, ios::app);
+			cout << " - contact : " << value << endl;
+			openfile.close();
+			_printerAll(inc->getDLink());
+		}
+		else if (inc->getType() == 1) {
+			ofstream openfile(FilePath, ios::app);
+			openfile << " - property : " << value << endl; openfile.close();
+			_printerAll(inc->getDLink());
+		}
+		else if (inc->getType() == 2) {
+			ofstream openfile(FilePath, ios::app);
+			openfile << " - data : " << value << endl; openfile.close();
+		}
+	}
+	if (inc->getNext()) {
+		_printerAll(inc->getNext());
+	}
+
 }
 
 //-------------------------------------
 int main() {
 	_filler();
-	_printerAll(GlobalList.getFirst());
+	int a = _printerAll(GlobalList.getFirst());
+
+	cout << "\n-----------------------------\n";
+	_deleteFromFile();
+	//_updateFile(GlobalList.getFirst());
+	int d = _printerAll(GlobalList.getFirst());
 
 }
