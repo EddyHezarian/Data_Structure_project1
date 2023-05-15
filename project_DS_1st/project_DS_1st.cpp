@@ -10,6 +10,7 @@ private:
 	friend class Stack;
 	string value;
 	int type;
+	//todo INT indent 
 	Node* dlink;
 	Node* next;
 
@@ -33,8 +34,12 @@ public:
 	Node* getDLink() { return this->dlink; }
 	Node* getNext() { return this->next; }
 	//*SETER functions------
-	void setLastNext(Node* currentNode, Node* addedNode){
-		Node* inc =  addedNode ;
+
+	//TODO setLastNext func 
+
+
+	void setLastNext(Node* currentNode, Node* addedNode) {
+		Node* inc = addedNode;
 		Node* tmp = currentNode->next;
 		if (tmp) {
 			setLastNext(tmp, addedNode);
@@ -63,31 +68,31 @@ public:
 	void showLayer() {
 		Node* inc = this->dlink;
 		while (inc != NULL) {
-			cout << "\n\t" << inc->value << endl; 
+			cout << "\n\t" << inc->value << endl;
 			inc = inc->next;
 		}
 	}
-	Node* getNextLayer(Node* current , string name) {
+	Node* getNextLayer(Node* current, string name) {
 		Node* inc = current;
 		bool flag = false;
 		while (!flag) {
 			if (inc->value == name) return inc->dlink;
 			else inc = inc->next;
-		} 
+		}
 	}
 };
 class Stack {
 private:
 	int size;
 	Node* top;
-	Node* topDLink ;
+	Node* topDLink;
 	Node* firstNode; //?fisrt varible is for having access to first node in stack after adding more head nodes in stack !
 public:
 	//*constructor --> every thing will be null at start of creating an instanse 
 	Stack() {
 		this->size = 0;
 		this->top = NULL;
-		this->topDLink = NULL; 
+		this->topDLink = NULL;
 		this->firstNode = NULL;
 	};
 	//*GETER functions -------
@@ -112,15 +117,15 @@ public:
 		}
 	}
 	void _addPropertyToStack(Node* prop) {
-		// if this is the first property 
+		//* if this is the first property 
 		if (this->top->dlink == NULL) {
 			this->top->setDLink(prop);
 			this->topDLink = this->top->dlink;
-		}/
-		else // if this node is not the first property for this head node
+		}
+		else //? if this node is not the first property for this head node
 		{
 			prop->setNext(top->getDLink());
-			top->setLastDLink(top, prop->value , 1);
+			top->setLastDLink(top, prop->value, 1);
 		}
 	}
 	void _addDataToStack(Node* data) {
@@ -133,11 +138,43 @@ public:
 			data->next = this->top->dlink->dlink;
 			this->top->dlink->dlink = data;
 		}
-
 	}
+	// TODO add prop(node, prop, parent)
+	//  ^ inc = node 
+	//  ^ if(inc != null)
+	// 		if(inc = parent )
+	// 			if(inc.dl = null )
+	// 				inc->dl = prop 
+	//       if (inc.dl.typ = data )
+	// 			inc.next = prop 
+	//       else inc.SETLASTNEXT(prop) 
+	//  ^ if(node.typ = 1 )
+	//  ^ func(node-dl, prop , parent)
+	//  ^ if(node.typ = 2)
+	//  ^ func(node.next ,prop , parent)
+	//  ^ if node.next not null 
+	//  ^ func(node->next , prop , parent)
+
+
+	//TODO add data(node , data , parent )
+	// inc = node 
+	//^ if(inc = parent )
+	// 		if(inc.dl = null )
+	//   		inc.dl = data 
+	//  	else 
+	//			inc.SETLASTNEXT(data)
+	//          
+	// if(inc  not NULL )
+	// 	if(inc.typ =1 )
+	// 		func(inc->dl)	
+	//  if (inc.typ =2 )
+	//      func(inc.nxt )
+	//  if(inc.nxt not null )   
+	//    func(inc.nxt)
+
 
 	//*layer methods ---> for add property feature ! 
-	void _PushLayerToStack(Node* layer){
+	void _PushLayerToStack(Node* layer) {
 		if (size == 0) {
 			this->top = layer;
 			this->firstNode = layer;
@@ -184,27 +221,40 @@ string titleDetectorFUNC(string line) {
 }
 void addMethodMenu() {
 	cout << "\n\t\tchoose add option  \n\n\n\t1-add New property\n\n\t2-add to Existing Property\n";
-
 }
 //!Features------------------------------------------
 void _filler() {
-	// filler function --> fill the global list with  data in file 
+	//* filler function --> fill the global list with  data in file 
 	ifstream _File;
 	_File.open(FilePath);
 	string _currentLine;
-
+	//TODO stack for dl
 	while (getline(_File, _currentLine)) {
 		int lineAction = actionDetectorFUNC(_currentLine);
+		//TODO indent counter func
+		//TODO node parent
 		string lineTitle = titleDetectorFUNC(_currentLine);
-		Node* instance = new Node(lineTitle, lineAction);
+		Node* instance = new Node(lineTitle, lineAction);//TODO add indent
 		switch (lineAction)
 		{
-		case 0:
+		case 0: {
+			//TODO if global.top not null add dl stack as dlink of  top of global stack
+			//TODO clear dl stack 
 			GlobalList._addHeadToStack(instance); break;
+		}
+		case 1: {
+			//TODO if indent 1 add without parent --> add to top of dl stack
+			//TODO else indet >1 add with parent --> add as dlink of top 
+			//GlobalList._addPropertyToStack(instance); 			
+			//TODO parent = inc
+			break;
+		}
+		case 2: {
+			//TODO add data with parent ( top of dl stack  , instanse , parent    )
+			 //GlobalList._addDataToStack(instance); break;
 
-		case 1: GlobalList._addPropertyToStack(instance); break;
+		}
 
-		case 2:GlobalList._addDataToStack(instance); break;
 		}
 
 	}
@@ -214,9 +264,9 @@ int _printerAll(Node* list) {
 	if (list == NULL)
 	{
 		cout << "\nEnd of list ...\n ";
-		return 0; 
+		return 0;
 	}
-	//priter function --> print all the elements in global list with specefic form . 
+	//*priter function --> print all the elements in global list with specefic form . 
 	Node* inc = list;
 	string value = inc->getValue();
 	if (inc != NULL) {
@@ -239,20 +289,19 @@ int _printerAll(Node* list) {
 }
 
 void _deleteAll() {
-	// deleteAll Function --> delete the whole list 
+	//* deleteAll Function --> delete the whole list 
 	GlobalList.deleteList();
 }
 
 void _Addcontact() {
-	//addContact Function ---> creat a single contact with single property and data . 
+	//*addContact Function ---> creat a single contact with single property and data . 
 	// warning --> user can not enter empty value for any items ...
 
-
-	string Namevalue ;
+	string Namevalue;
 	do {
 		cout << "enter name for contact : ";
 		getline(cin, Namevalue);
-		
+
 
 	} while (Namevalue == "");
 
@@ -290,7 +339,7 @@ void _addPropOnly() {
 		if (!flag) { cout << "\nname dosent exist--- try again\n type EXT for cancel adding property ....\n "; }
 
 	} while (!flag);
-	
+
 	if (!instance->getDLink())
 	{ // first property for contact 
 	  //Passed^^^
@@ -298,12 +347,12 @@ void _addPropOnly() {
 		cout << "\n\tChoose a title :  ";
 		string value;
 		getline(cin, value);
-		Node* dl   = new Node(value,1);
+		Node* dl = new Node(value, 1);
 		//continue to enter data :
-		int methodType=1;
+		int methodType = 1;
 		while (methodType != 2) {
 			cout << "\n\t\t choose an item :\n\n\t1-add property\n\t2-add data\n\n>> ";
-			cin >> methodType; 
+			cin >> methodType;
 			if (methodType == 1) {
 				cout << "\n adding property : enter a title : ";
 				cin.ignore();
@@ -320,7 +369,7 @@ void _addPropOnly() {
 		}
 		updateGlobalList(GlobalList.getFirst(), dl, name);
 	}
-	
+
 	else {
 		Stack Layers = Stack();
 		Node* _currentLayer = instance;
@@ -333,7 +382,7 @@ void _addPropOnly() {
 			if (method == "1") {
 
 				//do somthing 
-				break; 
+				break;
 			}
 
 			_currentLayer = _currentLayer->getNextLayer(_currentLayer, method);
@@ -346,7 +395,7 @@ void _addPropOnly() {
 }
 
 int _deleteFromFile() {
-	//deleteFromFile Function ---> delete All data from File and get ready for updateFile Function 
+	//*deleteFromFile Function ---> delete All data from File and get ready for updateFile Function 
 	// Passed ^^^
 	fstream ofs;
 	ofs.open(FilePath, ios::out | ios::trunc);
@@ -392,7 +441,7 @@ int _updateFile(Node* list) {
 //-------------------------------------
 int main() {
 	_filler();
-    _printerAll(GlobalList.getFirst());
+	_printerAll(GlobalList.getFirst());
 	cout << "\n-----------------------------\n";
 
 }
