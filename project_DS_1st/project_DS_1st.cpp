@@ -1,25 +1,20 @@
-
-
 #include<iostream>
 #include<fstream>
 #include<string>
 #include <sstream>
 
 using namespace std;
-
-
-
+//! Data structures---------------------------------
 class Node {
 private:
 	friend class Stack;
-
 	string value;
 	int type;
 	Node* dlink;
 	Node* next;
 
 public:
-	//Constructores------
+	//*Constructores------
 	Node(string title, int inputType) {
 		this->dlink = NULL;
 		this->next = NULL;
@@ -32,12 +27,21 @@ public:
 		this->dlink = inputDlink;
 		this->next = inputNext;
 	}
-	//GETER functions------
+	//*GETER functions------
 	int getType() { return this->type; }
 	string getValue() { return this->value; }
 	Node* getDLink() { return this->dlink; }
 	Node* getNext() { return this->next; }
-	//SETER functions------
+	//*SETER functions------
+	void setLastNext(Node* currentNode, Node* addedNode){
+		Node* inc =  addedNode ;
+		Node* tmp = currentNode->next;
+		if (tmp) {
+			setLastNext(tmp, addedNode);
+		}
+		else
+			this->next = inc;
+	}
 	void setNext(Node* node) { this->next = node; }
 	void setDLink(Node* node) { this->dlink = node; }
 	void setLastDLink(Node* node, string val, int typ) {
@@ -49,37 +53,51 @@ public:
 		else
 			this->dlink = inc;
 	}
-	//general methods------
+	//*general methods------
 	bool isAnyDLink() {
 		if (dlink == NULL) return false;
 		else
 			return true;
 
 	}
+	void showLayer() {
+		Node* inc = this->dlink;
+		while (inc != NULL) {
+			cout << "\n\t" << inc->value << endl; 
+			inc = inc->next;
+		}
+	}
+	Node* getNextLayer(Node* current , string name) {
+		Node* inc = current;
+		bool flag = false;
+		while (!flag) {
+			if (inc->value == name) return inc->dlink;
+			else inc = inc->next;
+		} 
+	}
 };
 class Stack {
 private:
 	int size;
 	Node* top;
-	Node* firstNode; // fisrt varible is for having access to first node in stack after adding more head nodes in stack !
+	Node* topDLink ;
+	Node* firstNode; //?fisrt varible is for having access to first node in stack after adding more head nodes in stack !
 public:
-	//constructor --> every thing will be null at start of creating an instanse 
+	//*constructor --> every thing will be null at start of creating an instanse 
 	Stack() {
 		this->size = 0;
 		this->top = NULL;
+		this->topDLink = NULL; 
 		this->firstNode = NULL;
 	};
-
-	//GETER functions -------
+	//*GETER functions -------
 	int getSize() { return size; }
 	Node* getFirst() { return firstNode; }
-
-	//SETER methods ----------
+	//*SETER methods ----------
 	void deleteList() {
 		this->firstNode = NULL;
 	}
-
-	//Add methods --> each node type have thier own add method 
+	//*Add methods --> each node type have thier own add method 
 	void _addHeadToStack(Node* head) {
 		if (size == 0) {
 			this->top = head;
@@ -97,11 +115,12 @@ public:
 		// if this is the first property 
 		if (this->top->dlink == NULL) {
 			this->top->setDLink(prop);
-		}
+			this->topDLink = this->top->dlink;
+		}/
 		else // if this node is not the first property for this head node
 		{
 			prop->setNext(top->getDLink());
-			top->setDLink(prop);
+			top->setLastDLink(top, prop->value , 1);
 		}
 	}
 	void _addDataToStack(Node* data) {
@@ -116,14 +135,31 @@ public:
 		}
 
 	}
+
+	//*layer methods ---> for add property feature ! 
+	void _PushLayerToStack(Node* layer){
+		if (size == 0) {
+			this->top = layer;
+			this->firstNode = layer;
+			this->size++;
+		}
+		else
+		{
+			top->setDLink(layer);
+			this->top = layer;
+			this->size++;
+		}
+	}
+	void _addPropToLayer(Node* layer) {
+		this->top->setLastNext(this->top, layer);
+	}
 };
-// global list var here-----------------------------
+//! global list var here-----------------------------
 Stack GlobalList = Stack();
 string FilePath = "C:\\code\\cpp\\project_DS_1st\\ex.txt";
-
-//tools functions --------------------------------------------------------------------------
+//!tools functions ----------------------------------
 int actionDetectorFUNC(string line) {
-	//action detector finction -- > detect type of node in given sentece by file 
+	//!action detector finction -- > detect type of node in given sentece by file 
 	string dash;
 	string actionType;
 	istringstream iss;
@@ -133,7 +169,13 @@ int actionDetectorFUNC(string line) {
 	if (actionType == "contact") { return 0; }
 	else if (actionType == "property") { return 1; }
 	else if (actionType == "data") { return 2; }
-
+}
+void updateGlobalList(Node* list, Node* dl, string name) {
+	if (list != NULL) {
+		if (list->getValue() != name) { updateGlobalList(list->getNext(), dl, name); }
+		else
+			list->setDLink(dl);
+	}
 }
 string titleDetectorFUNC(string line) {
 	size_t pos = line.find(":");
@@ -144,7 +186,7 @@ void addMethodMenu() {
 	cout << "\n\t\tchoose add option  \n\n\n\t1-add New property\n\n\t2-add to Existing Property\n";
 
 }
-//Features-----------------------------------------------------------
+//!Features------------------------------------------
 void _filler() {
 	// filler function --> fill the global list with  data in file 
 	ifstream _File;
@@ -172,7 +214,7 @@ int _printerAll(Node* list) {
 	if (list == NULL)
 	{
 		cout << "\nEnd of list ...\n ";
-		return 0;
+		return 0; 
 	}
 	//priter function --> print all the elements in global list with specefic form . 
 	Node* inc = list;
@@ -206,19 +248,15 @@ void _Addcontact() {
 	// warning --> user can not enter empty value for any items ...
 
 
-	string Namevalue, propertyValue, dataValue;
+	string Namevalue ;
 	do {
 		cout << "enter name for contact : ";
 		getline(cin, Namevalue);
-		cout << "add a property title  : ";
-		getline(cin, propertyValue);
-		cout << "add a data for " << propertyValue << " : ";
-		getline(cin, dataValue);
+		
 
-	} while (Namevalue == "" || propertyValue == "" || dataValue == "");
-	Node* newData = new Node(dataValue, 2);
-	Node* newProperty = new Node(propertyValue, 1, newData, NULL);
-	Node* newContact = new Node(Namevalue, 0, newProperty, NULL);
+	} while (Namevalue == "");
+
+	Node* newContact = new Node(Namevalue, 0, NULL, NULL);
 
 	GlobalList._addHeadToStack(newContact);
 
@@ -229,8 +267,8 @@ void _Addcontact() {
 
 }
 
-void _addPropertyOnly() {
-	//addPropertyOnly Function ---> for adding property whether its data type or its property we use this function.
+void _addPropOnly() {
+
 	Node* instance = GlobalList.getFirst();
 	string name;
 	bool flag = false;
@@ -252,67 +290,78 @@ void _addPropertyOnly() {
 		if (!flag) { cout << "\nname dosent exist--- try again\n type EXT for cancel adding property ....\n "; }
 
 	} while (!flag);
-	// moving global instance to the right contact index ^ 
-
-	int methodType; //this varable is selcecting add method  1-new property 2-add in existing property 
-	addMethodMenu();
-	cin >> methodType;
-	switch (methodType)
-	{
-	case 1: {
-		bool isFisrtProp = true;
-		string valueOfProperty;
-		int typeOfProperty = 1;
-		cout << "\nadding fisrt property...\n\n ";
-		do {
-			string valueOfProperty;
-			int typeOfProperty;
-
-			if (!isFisrtProp) {// first option have to be a property type ! cuz its new for contact 
-				cout << "\n\t1-add Property :\n\n\t2-add Data : \n";
-				cin >> typeOfProperty;
+	
+	if (!instance->getDLink())
+	{ // first property for contact 
+	  //Passed^^^
+		cout << "\n\t\tadding first property\n\n";
+		cout << "\n\tChoose a title :  ";
+		string value;
+		getline(cin, value);
+		Node* dl   = new Node(value,1);
+		//continue to enter data :
+		int methodType=1;
+		while (methodType != 2) {
+			cout << "\n\t\t choose an item :\n\n\t1-add property\n\t2-add data\n\n>> ";
+			cin >> methodType; 
+			if (methodType == 1) {
+				cout << "\n adding property : enter a title : ";
+				cin.ignore();
+				getline(cin, value);
+				dl->setLastDLink(dl, value, 1);
 			}
-			isFisrtProp = false;
-			cout << "\n\t title : ";
-			cin >> typeOfProperty;
-			//add with built in method 
-			instance->setLastDLink(instance, valueOfProperty, typeOfProperty);
-			cout << "\n\n_________________proccess finished_________________________\n\n";
-
-		} while (typeOfProperty == 2);
-
-
-	}; break;
-	case 2: {};
-	default: {
-		system("color 41");
-		cout << "item not found ....";
-		exit(1);
-	};
-		   break;
+			else
+			{
+				cout << "\n\tadding data \n\t: enter a title : ";
+				cin.ignore();
+				getline(cin, value);
+				dl->setLastDLink(dl, value, 2);
+			}
+		}
+		updateGlobalList(GlobalList.getFirst(), dl, name);
 	}
+	
+	else {
+		Stack Layers = Stack();
+		Node* _currentLayer = instance;
+		string method = "0";
+		while (method != "1")
+		{
+			cout << "\n\t\t adding property \n\t\t( select an layer or Enter (1) for adding in current layer\nlayers: \n";
+			_currentLayer->showLayer();
+			getline(cin, method);
+			if (method == "1") {
 
+				//do somthing 
+				break; 
+			}
 
-	// save file func
+			_currentLayer = _currentLayer->getNextLayer(_currentLayer, method);
+			Layers._PushLayerToStack(_currentLayer);
 
+		}
+
+	}
 
 }
 
 int _deleteFromFile() {
+	//deleteFromFile Function ---> delete All data from File and get ready for updateFile Function 
+	// Passed ^^^
 	fstream ofs;
 	ofs.open(FilePath, ios::out | ios::trunc);
 	ofs.close();
 	return 0;
 }
 
-// update file 
 int _updateFile(Node* list) {
 	//ofstream openfile(FilePath, ios::app);
+	//passed ^^^
 
 	if (list == NULL)
 	{
 		cout << "\nEnd of list ...\n ";
-		return 0;
+		return 1;
 	}
 	//priter function --> print all the elements in global list with specefic form . 
 	Node* inc = list;
@@ -320,14 +369,14 @@ int _updateFile(Node* list) {
 	if (inc != NULL) {
 		if (inc->getType() == 0) {
 			ofstream openfile(FilePath, ios::app);
-			cout << " - contact : " << value << endl;
+			openfile << " - contact : " << value << endl;
 			openfile.close();
-			_printerAll(inc->getDLink());
+			_updateFile(inc->getDLink());
 		}
 		else if (inc->getType() == 1) {
 			ofstream openfile(FilePath, ios::app);
 			openfile << " - property : " << value << endl; openfile.close();
-			_printerAll(inc->getDLink());
+			_updateFile(inc->getDLink());
 		}
 		else if (inc->getType() == 2) {
 			ofstream openfile(FilePath, ios::app);
@@ -335,7 +384,7 @@ int _updateFile(Node* list) {
 		}
 	}
 	if (inc->getNext()) {
-		_printerAll(inc->getNext());
+		_updateFile(inc->getNext());
 	}
 
 }
@@ -343,11 +392,7 @@ int _updateFile(Node* list) {
 //-------------------------------------
 int main() {
 	_filler();
-	int a = _printerAll(GlobalList.getFirst());
-
+    _printerAll(GlobalList.getFirst());
 	cout << "\n-----------------------------\n";
-	_deleteFromFile();
-	//_updateFile(GlobalList.getFirst());
-	int d = _printerAll(GlobalList.getFirst());
 
 }

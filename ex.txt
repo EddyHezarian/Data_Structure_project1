@@ -1,9 +1,22 @@
-- contact : mohsen
-- property : phone
-- data : 09391556862
-- property : emali  
-- data : eddyhzn@gmail.com
-- data : somorihezarian@yahoo.com
-- contact : abdolah
-- property : phone
-- data : eddyhzn@gmail.com
+ - contact : Reza Karimi
+ - property : Occuption
+ - data : JSU Student
+ - property : Phone
+ - property : Mobile
+ - data : 09166662002
+ - data : 09366662002
+ - property : Home
+ - data : 06142422002
+ - property : Address
+ - data : NO. 64618222002, Dezful, Khuzestan
+ - property : Email
+ - property : Official
+ - data : Reza.karimi@jsu.ac.ir
+ - property : Unofficial
+ - data : Reza2001@gmail.com
+ - data : R.Karimi@yhoo.com
+ - property : Socail Net.
+ - property : Linkedin
+ - data : www.linkedin.com/in/Reza-Karimi-03000006/
+ - property : instagram
+ - data : www.instagram.com/reza200202/

@@ -1,3 +1,6 @@
 ﻿  project_DS_1st.cpp
-C:\code\cpp\project_DS_1st\project_DS_1st\project_DS_1st.cpp(121): warning C4715: 'actionDetectorFUNC': not all control paths return a value
+C:\code\cpp\project_DS_1st\project_DS_1st\project_DS_1st.cpp(186): warning C4715: 'actionDetectorFUNC': not all control paths return a value
+C:\code\cpp\project_DS_1st\project_DS_1st\project_DS_1st.cpp(253): warning C4715: '_printerAll': not all control paths return a value
+C:\code\cpp\project_DS_1st\project_DS_1st\project_DS_1st.cpp(404): warning C4715: '_updateFile': not all control paths return a value
+C:\code\cpp\project_DS_1st\project_DS_1st\project_DS_1st.cpp(83): warning C4715: 'Node::getNextLayer': not all control paths return a value
   project_DS_1st.vcxproj -> C:\code\cpp\project_DS_1st\x64\Debug\project_DS_1st.exe
