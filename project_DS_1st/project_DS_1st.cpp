@@ -10,20 +10,31 @@ private:
 	friend class Stack;
 	string value;
 	int type;
-	//todo INT indent 
+
+	int indent;
 	Node* dlink;
 	Node* next;
 
 public:
 	//*Constructores------
+
 	Node(string title, int inputType) {
 		this->dlink = NULL;
+		this->indent = 0;
 		this->next = NULL;
 		this->value = title;
 		this->type = inputType;
 	}
-	Node(string inputTitle, int inputType, Node* inputDlink, Node* inputNext) {
+	Node(string title, int inputType, int inputindent) {
+		this->dlink = NULL;
+		this->indent = inputindent;
+		this->next = NULL;
+		this->value = title;
+		this->type = inputType;
+	}
+	Node(string inputTitle, int inputType, Node* inputDlink, Node* inputNext, int inputindent) {
 		this->value = inputTitle;
+		this->indent = inputindent;
 		this->type = inputType;
 		this->dlink = inputDlink;
 		this->next = inputNext;
@@ -36,15 +47,13 @@ public:
 	//*SETER functions------
 
 	//TODO setLastNext func 
-
-
 	void setLastNext(Node* currentNode, Node* addedNode) {
 		Node* inc = addedNode;
 		Node* tmp = currentNode->next;
 		if (tmp) {
 			setLastNext(tmp, addedNode);
 		}
-		else
+		if (tmp == NULL)
 			this->next = inc;
 	}
 	void setNext(Node* node) { this->next = node; }
@@ -98,6 +107,7 @@ public:
 	//*GETER functions -------
 	int getSize() { return size; }
 	Node* getFirst() { return firstNode; }
+	Node* getTop() { return this->top; }
 	//*SETER methods ----------
 	void deleteList() {
 		this->firstNode = NULL;
@@ -140,6 +150,19 @@ public:
 		}
 	}
 	// TODO add prop(node, prop, parent)
+	void _addProp(Node* node, Node* prop, Node* parent) {
+		Node* inc = node;
+		if (inc != NULL) {
+			if (inc == parent) {
+				if (inc->dlink == NULL) {
+					inc->dlink = prop;
+				}
+				else if (inc->dlink->type == 2) {
+				}
+
+			}
+		}
+	}
 	//  ^ inc = node 
 	//  ^ if(inc != null)
 	// 		if(inc = parent )
@@ -222,31 +245,46 @@ string titleDetectorFUNC(string line) {
 void addMethodMenu() {
 	cout << "\n\t\tchoose add option  \n\n\n\t1-add New property\n\n\t2-add to Existing Property\n";
 }
+int indentCounterFUNC(string str) {
+	//* indents counter Function ---> proccessing indents in file for recognizinging the realations between lines . 
+	int indents = -1;
+	for (int i = 0; str[i] != 32; i++)
+	{
+		indents++;
+	}
+	return indents;
+}
 //!Features------------------------------------------
 void _filler() {
 	//* filler function --> fill the global list with  data in file 
 	ifstream _File;
 	_File.open(FilePath);
 	string _currentLine;
-	//TODO stack for dl
+	Node* parent;
+	Stack DLStack = Stack();//! 
 	while (getline(_File, _currentLine)) {
 		int lineAction = actionDetectorFUNC(_currentLine);
-		//TODO indent counter func
-		//TODO node parent
+		int lineIndent = indentCounterFUNC(_currentLine);
 		string lineTitle = titleDetectorFUNC(_currentLine);
-		Node* instance = new Node(lineTitle, lineAction);//TODO add indent
+		Node* instance = new Node(lineTitle, lineAction, lineIndent);//TODO add indent
+
 		switch (lineAction)
 		{
 		case 0: {
 			//TODO if global.top not null add dl stack as dlink of  top of global stack
-			//TODO clear dl stack 
+			if (GlobalList.getSize() != 0) { GlobalList.getTop()->setDLink(DLStack.getFirst()); }
+			DLStack.deleteList();
 			GlobalList._addHeadToStack(instance); break;
 		}
 		case 1: {
 			//TODO if indent 1 add without parent --> add to top of dl stack
+			if (lineIndent == 1) { DLStack._addHeadToStack(instance); }
+			else {
+
+			}
 			//TODO else indet >1 add with parent --> add as dlink of top 
 			//GlobalList._addPropertyToStack(instance); 			
-			//TODO parent = inc
+			parent = instance;
 			break;
 		}
 		case 2: {
@@ -305,7 +343,7 @@ void _Addcontact() {
 
 	} while (Namevalue == "");
 
-	Node* newContact = new Node(Namevalue, 0, NULL, NULL);
+	Node* newContact = new Node(Namevalue, 0, NULL, NULL, 0);
 
 	GlobalList._addHeadToStack(newContact);
 
