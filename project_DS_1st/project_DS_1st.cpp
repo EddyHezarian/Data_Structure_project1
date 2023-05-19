@@ -10,7 +10,6 @@ private:
 	friend class Stack;
 	string value;
 	int type;
-
 	int indent;
 	Node* dlink;
 	Node* next;
@@ -61,7 +60,7 @@ public:
 				}
 				else
 				{
-					if (inc->getDLink()->getType() == 2) {
+					if (inc->dlink->type == 2) {
 						inc->setNext(prop);
 					}
 					else
@@ -70,17 +69,12 @@ public:
 					}
 				}
 			}
-			if (inc->getType() == 1) {
-				_addProp(inc->getDLink(), prop, parent);
+			if (inc->type == 1) {
+					_addProp(inc->dlink, prop, parent);
 			}
-			else if (inc->getType() == 2)
-				_addProp(inc->getNext(), prop, parent);
+			else if (inc->type == 2)
+				_addProp(inc->next, prop, parent);
 		}
-		/*if (inc->getNext())
-		{
-			_addProp(inc->getNext(), prop, parent);
-		}*/
-
 	}
 	void _addData(Node* node, Node* data, Node* parent)
 	{
@@ -107,57 +101,16 @@ public:
 				}
 			}
 			if (inc->type == 1)
-				_addData(inc->dlink, data, parent);
+				if (inc->dlink->type == 2)
+					_addData(inc->next, data, parent);
+				else
+					_addData(inc->dlink, data, parent);
 			else if (inc->type == 2)
 				_addData(inc->next, data, parent);
 		}
-		//if (inc->next)
-			//_addData(inc->next, data, parent);
-
+		
 	}
-	//void _addProp(Node* node, Node* prop, Node* parent) {
-	//	Node* inc = node;
-	//	if (node == NULL)
-	//	{
-	//		node = inc;
-	//	}
-	//	if (inc != NULL) {
-	//		if (inc == parent) {
-	//			if (inc->dlink == NULL) {
-	//				inc->dlink = prop;
-	//			}
-	//			else
-	//			{
-	//				if (inc->dlink->type == 2) {
-	//					inc->next = prop;
-	//				}
-	//				else
-	//				{
-	//					inc->dlink = prop;
-	//				}
-	//			}
-	//		}
-	//		if (inc->type == 1) {
-	//			_addProp(inc->dlink, prop, parent);
-	//		}
-	//		else if (inc->type == 2)
-	//			_addProp(inc->next, prop, parent);
-	//	}
-	//	if (inc->next)
-	//	{
-	//		_addProp(inc->next, prop, parent);
-	//	}
 
-	//}
-		/*if (tmp == NULL)
-			tmp->next = inc;
-		while (tmp->next) {
-
-			tmp = tmp->next;
-		}
-		tmp->next = inc;*/
-	    
-	
 	void setNext(Node* node) { this->next = node; }
 	void setDLink(Node* node) { this->dlink = node; }
 	void setLastDLink(Node* node, string val, int typ) {
@@ -262,73 +215,6 @@ public:
 			this->top->dlink->dlink = data;
 		}
 	}
-	// TODO add prop(node, prop, parent)
-	void _addProp(Node* node, Node* prop, Node* parent) {
-		Node* inc = node;
-		if (node == NULL)
-		{
-			node = inc;
-		}
-		if (inc != NULL) {
-			if (inc == parent) {
-				if (inc->dlink == NULL) {
-					inc->dlink = prop;
-				}
-				else
-				{
-					if (inc->dlink->type == 2){
-						inc->next = prop;
-					}
-					else
-					{
-						inc->dlink = prop;
-					}
-				}
-			}
-			if (inc->type == 1) {
-				_addProp(inc->dlink, prop, parent);
-			}
-			else if (inc->type == 2)
-				_addProp(inc->next, prop, parent);
-		}
-		if (inc->next)
-		{
-			_addProp(inc->next, prop, parent);
-		}
-		
-	}
-	
-	//  ^ inc = node 
-	//  ^ if(inc != null)
-	// 		if(inc = parent )
-	// 			if(inc.dl = null )
-	// 				inc->dl = prop 
-	//       if (inc.dl.typ = data )
-	// 			inc.next = prop 
-	//       else inc.SETLASTNEXT(prop) 
-	//  ^ if(node.typ = 1 )
-	//  ^ func(node-dl, prop , parent)
-	//  ^ if(node.typ = 2)
-	//  ^ func(node.next ,prop , parent)
-	//  ^ if node.next not null 
-	//  ^ func(node->next , prop , parent)
-
-
-	//TODO add data(node , data , parent )
-	// inc = node 
-	//^ if(inc = parent )
-	// 		if(inc.dl = null )
-	//   		inc.dl = data 
-	//  	else 
-	//			inc.SETLASTNEXT(data)
-	//          
-	// if(inc  not NULL )
-	// 	if(inc.typ =1 )
-	// 		func(inc->dl)	
-	//  if (inc.typ =2 )
-	//      func(inc.nxt )
-	//  if(inc.nxt not null )   
-	//    func(inc.nxt)
 
 
 	//*layer methods ---> for add property feature ! 
@@ -353,76 +239,6 @@ public:
 Stack GlobalList = Stack();
 string FilePath = "C:\\Users\\ariyan system\\Desktop\\New folder\\Data_Structure_project1\\ex.txt";
 //!tools functions ----------------------------------
-
-void _addProp(Node* node, Node* prop, Node* parent) {
-	Node* inc = node;
-	if (inc == NULL)
-	{
-		node = inc;
-	}
-	if (inc != NULL) {
-		if (inc == parent) {
-			if (inc->getDLink() == NULL) {
-				inc->setDLink(prop) ;
-			}
-			else
-			{
-				if (inc->getDLink()->getType() == 2) {
-					inc->setNext(prop) ;
-				}
-				else
-				{
-					inc->setDLink(prop) ;
-				}
-			}
-		}
-		if (inc->getType() == 1) {
-			_addProp(inc->getDLink(), prop, parent);
-		}
-		else if (inc->getType() == 2)
-			_addProp(inc->getNext(), prop, parent);
-	}
-	if (inc->getNext())
-	{
-		_addProp(inc->getNext(), prop, parent);
-	}
-
-}
-
-
-void _addData(Node* node, Node* data, Node* parent)
-{
-
-	Node* inc = node;
-	if (node == NULL)
-	{
-		node = inc;
-	}
-	if (inc)
-	{
-		if (inc == parent)
-		{
-			if (inc->getNext() == NULL)
-			{
-				inc->setDLink(data);
-			}
-			else
-			{
-				Node* tmp = inc->getDLink();
-				data->setNext(tmp) ;
-				inc->setDLink(data);
-
-			}
-		}
-		if (inc->getType() == 1)
-			_addData(inc->getDLink(), data, parent);
-		else if (inc->getType() == 2)
-			_addData(inc->getNext(), data, parent);
-	}
-	if (inc->getNext())
-		_addData(inc->getNext(), data, parent);
-
-}
 
 int actionDetectorFUNC(string line) {
 	//!action detector finction -- > detect type of node in given sentece by file 
@@ -467,43 +283,33 @@ void _filler() {
 	_File.open(FilePath);
 	string _currentLine;
 	Node* parent = new Node(" ",0);
-	Stack DLStack = Stack();//! 
+	Stack DLStack = Stack();
 	while (getline(_File, _currentLine)) {
 		int lineAction = actionDetectorFUNC(_currentLine);
 		int lineIndent = indentCounterFUNC(_currentLine);
 		string lineTitle = titleDetectorFUNC(_currentLine);
-		Node* instance = new Node(lineTitle, lineAction, lineIndent);//TODO add indent
-
+		Node* instance = new Node(lineTitle, lineAction, lineIndent);
 		switch (lineAction)
 		{
 		case 0: {
-			//TODO if global.top not null add dl stack as dlink of  top of global stack
 			if (GlobalList.getSize() != 0) { GlobalList.getTop()->setDLink(DLStack.getFirst()); }
 			DLStack.deleteList();
 			GlobalList._addHeadToStack(instance); break;
 		}
 		case 1: {
-			//TODO if indent 1 add without parent --> add to top of dl stack
 			if (lineIndent == 1) { DLStack._addHeadToStack(instance); }
 			else {
 				DLStack.getTop()->_addProp(DLStack.getTop(), instance, parent);
-			}
-			//TODO else indet >1 add with parent --> add as dlink of top 
-			//GlobalList._addPropertyToStack(instance); 			
+			}		
 			parent = instance;
 			break;
 		}
-		case 2: {
-			
-			DLStack.getTop()->_addData(DLStack.getTop(), instance, parent);
-			//TODO add data with parent ( top of dl stack  , instanse , parent    )
-			 //GlobalList._addDataToStack(instance); break;
-
+		case 2: {			
+			DLStack.getTop()->_addData(DLStack.getTop(), instance, parent); break;
 		}
-
 		}
-
 	}
+	GlobalList.getTop()->setDLink(DLStack.getFirst());
 }
 
 int _printerAll(Node* list) {
@@ -687,7 +493,7 @@ int _updateFile(Node* list) {
 //-------------------------------------
 int main() {
 	_filler();
-	//_printerAll(GlobalList.getFirst());
+	_printerAll(GlobalList.getFirst());
 	cout << "\n-----------------------------\n";
 
 }

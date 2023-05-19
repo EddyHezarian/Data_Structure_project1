@@ -19,4 +19,4 @@
 		- property : Linkedin
 			- data : www.linkedin.com/in/Reza-Karimi-03000006/
 		- property : instagram
-			-data : www.instagram.com/reza200202/
+			- data : www.instagram.com/reza200202/
