@@ -16,7 +16,6 @@ private:
 
 public:
 	//*Constructores------
-
 	Node(string title, int inputType) {
 		this->dlink = NULL;
 		this->indent = 0;
@@ -43,10 +42,9 @@ public:
 	string getValue() { return this->value; }
 	Node* getDLink() { return this->dlink; }
 	Node* getNext() { return this->next; }
+	int getIndent() { return this->indent; }
 	//*SETER functions------
-
 	//TODO setLastNext func
-
 	void _addProp(Node* node, Node* prop, Node* parent) {
 		Node* inc = node;
 		if (inc == NULL)
@@ -70,12 +68,64 @@ public:
 				}
 			}
 			if (inc->type == 1) {
-					_addProp(inc->dlink, prop, parent);
+				_addProp(inc->dlink, prop, parent);
 			}
 			else if (inc->type == 2)
 				_addProp(inc->next, prop, parent);
 		}
 	}
+	void AddPropertyFeature(Node* node, string value, string parent)
+	{
+		Node* inc = node;
+		if (inc == NULL)
+		{
+			node = inc;
+		}
+		if (inc != NULL)
+		{
+			if (inc->value == parent)
+			{
+
+				if (inc->dlink == NULL)
+				{
+					Node* item = new Node(value, 1, inc->indent + 1);
+					inc->dlink = item;
+				}
+				else {
+					if (inc->dlink->type == 2)
+					{
+
+						if (inc->next == NULL)
+						{
+							Node* item = new Node(value, 1, inc->indent);
+							inc->next = item;
+						}
+
+						else
+						{
+							Node* item = new Node(value, 1, inc->indent);
+							item->next = inc->next;
+							inc->next = item;
+						}
+					}
+					else {
+						Node* item = new Node(value, 1, inc->indent + 1);
+						inc->dlink = item;
+					}
+				}
+			}
+			if (inc->type == 1)
+			{
+				AddPropertyFeature(inc->dlink, value, parent);
+			}
+			else if (inc->type == 2) {
+				AddPropertyFeature(inc->next, value, parent);
+			}
+		}
+	}
+
+
+
 	void _addData(Node* node, Node* data, Node* parent)
 	{
 
@@ -108,25 +158,25 @@ public:
 			else if (inc->type == 2)
 				_addData(inc->next, data, parent);
 		}
-		
-	}
 
+	}
 	void setNext(Node* node) { this->next = node; }
 	void setDLink(Node* node) { this->dlink = node; }
-	void setLastDLink(Node* node, string val, int typ) {
-		Node* inc = new Node(val, typ);
-		Node* tmp = node->dlink;
-		if (tmp) {
-			setLastDLink(tmp, val, typ);
+	void setLastDLink(Node* node, string val, int typ, int indent) {
+		Node* inc = new Node(val, typ, indent);
+		if (node) {
+			setLastDLink(node->dlink, val, typ, indent);
 		}
 		else
-			this->dlink = inc;
+			node = inc;
+
+
 	}
-	void setLastNext(Node* node,Node* item) {
-		
+	void setLastNext(Node* node, Node* item) {
+
 		Node* tmp = node->dlink;
 		if (tmp) {
-			setLastNext(tmp,item);
+			setLastNext(tmp, item);
 		}
 		else
 			this->dlink = item;
@@ -154,8 +204,6 @@ public:
 		}
 	}
 };
-
-
 class Stack {
 private:
 	int size;
@@ -192,29 +240,29 @@ public:
 			this->size++;
 		}
 	}
-	void _addPropertyToStack(Node* prop) {
-		//* if this is the first property 
-		if (this->top->dlink == NULL) {
-			this->top->setDLink(prop);
-			this->topDLink = this->top->dlink;
-		}
-		else //? if this node is not the first property for this head node
-		{
-			prop->setNext(top->getDLink());
-			top->setLastDLink(top, prop->value, 1);
-		}
-	}
-	void _addDataToStack(Node* data) {
-		if (this->top->dlink->dlink == NULL)
-		{
-			this->top->dlink->dlink = data;
-		}
-		else
-		{
-			data->next = this->top->dlink->dlink;
-			this->top->dlink->dlink = data;
-		}
-	}
+	// void _addPropertyToStack(Node* prop) {
+	// 	//* if this is the first property 
+	// 	if (this->top->dlink == NULL) {
+	// 		this->top->setDLink(prop);
+	// 		this->topDLink = this->top->dlink;
+	// 	}
+	// 	else //? if this node is not the first property for this head node
+	// 	{
+	// 		prop->setNext(top->getDLink());
+	// 		top->setLastDLink(top, prop->value, 1);
+	// 	}
+	// }
+	// void _addDataToStack(Node* data) {
+	// 	if (this->top->dlink->dlink == NULL)
+	// 	{
+	// 		this->top->dlink->dlink = data;
+	// 	}
+	// 	else
+	// 	{
+	// 		data->next = this->top->dlink->dlink;
+	// 		this->top->dlink->dlink = data;
+	// 	}
+	// }
 
 
 	//*layer methods ---> for add property feature ! 
@@ -237,9 +285,8 @@ public:
 };
 //! global list var here-----------------------------
 Stack GlobalList = Stack();
-string FilePath = "C:\\Users\\ariyan system\\Desktop\\New folder\\Data_Structure_project1\\ex.txt";
+string FilePath = "C:\\Users\\Eddy\\Desktop\\ex.txt";
 //!tools functions ----------------------------------
-
 int actionDetectorFUNC(string line) {
 	//!action detector finction -- > detect type of node in given sentece by file 
 	string dash;
@@ -259,6 +306,30 @@ void updateGlobalList(Node* list, Node* dl, string name) {
 			list->setDLink(dl);
 	}
 }
+void PrintContactTree(Node* contact) {
+	Node* inc = contact;
+	string value = inc->getValue();
+	if (inc == NULL)
+		cout << "end of list...\n";
+	if (inc)
+	{
+		if (inc->getType() == 1) {
+			int indent = inc->getIndent();
+			for (int i = 1; i <= indent; i++)
+				cout << "\t";
+			cout << "property : " << value << endl;
+			PrintContactTree(inc->getDLink());
+		}
+		else if (inc->getType() == 2) {
+			int indent = inc->getIndent();
+			for (int i = 1; i <= indent; i++)
+				cout << "\t";
+			cout << "data : " << value << endl;
+		}
+	}
+	if (inc->getNext())
+		PrintContactTree(inc->getNext());
+}
 string titleDetectorFUNC(string line) {
 	size_t pos = line.find(":");
 	if (pos == std::string::npos) { return ""; }
@@ -274,7 +345,7 @@ int indentCounterFUNC(string str) {
 	{
 		indents++;
 	}
-	return indents-1;
+	return indents - 1;
 }
 //!Features------------------------------------------
 void _filler() {
@@ -282,7 +353,7 @@ void _filler() {
 	ifstream _File;
 	_File.open(FilePath);
 	string _currentLine;
-	Node* parent = new Node(" ",0);
+	Node* parent = new Node(" ", 0);
 	Stack DLStack = Stack();
 	while (getline(_File, _currentLine)) {
 		int lineAction = actionDetectorFUNC(_currentLine);
@@ -300,25 +371,23 @@ void _filler() {
 			if (lineIndent == 1) { DLStack._addHeadToStack(instance); }
 			else {
 				DLStack.getTop()->_addProp(DLStack.getTop(), instance, parent);
-			}		
+			}
 			parent = instance;
 			break;
 		}
-		case 2: {			
+		case 2: {
 			DLStack.getTop()->_addData(DLStack.getTop(), instance, parent); break;
 		}
 		}
 	}
 	GlobalList.getTop()->setDLink(DLStack.getFirst());
 }
-
-int _printerAll(Node* list) {
+int _printerAll(Node* list) {//*priter function --> print all the elements in global list with specefic form .
 	if (list == NULL)
 	{
 		cout << "\nEnd of list ...\n ";
 		return 0;
 	}
-	//*priter function --> print all the elements in global list with specefic form . 
 	Node* inc = list;
 	string value = inc->getValue();
 	if (inc != NULL) {
@@ -339,37 +408,28 @@ int _printerAll(Node* list) {
 	}
 
 }
-
-void _deleteAll() {
-	//* deleteAll Function --> delete the whole list 
+void _deleteAll() {//* deleteAll Function --> delete the whole list 
 	GlobalList.deleteList();
 }
+void _showContactTree(Node* list, string name) {
 
-void _Addcontact() {
-	//*addContact Function ---> creat a single contact with single property and data . 
+	Node* inc = list;
+	while (inc->getValue() != name)
+		inc = inc->getNext();
+	PrintContactTree(inc->getDLink());
+}
+void _Addcontact() {//*addContact Function ---> creat a single contact with single property and data . 
 	// warning --> user can not enter empty value for any items ...
-
 	string Namevalue;
 	do {
 		cout << "enter name for contact : ";
 		getline(cin, Namevalue);
-
-
 	} while (Namevalue == "");
-
 	Node* newContact = new Node(Namevalue, 0, NULL, NULL, 0);
-
 	GlobalList._addHeadToStack(newContact);
-
 	cout << "\ncontact create successfully ... " << Namevalue << "\n\n";
-
-
-	// need  function to save list to file ... 
-
 }
-
 void _addPropOnly() {
-
 	Node* instance = GlobalList.getFirst();
 	string name;
 	bool flag = false;
@@ -383,88 +443,58 @@ void _addPropOnly() {
 			{
 				flag = true;
 				break;
-
 			}
 			else
 				instance = instance->getNext();
 		}
 		if (!flag) { cout << "\nname dosent exist--- try again\n type EXT for cancel adding property ....\n "; }
-
 	} while (!flag);
-
 	if (!instance->getDLink())
 	{ // first property for contact 
 	  //Passed^^^
 		cout << "\n\t\tadding first property\n\n";
 		cout << "\n\tChoose a title :  ";
 		string value;
+		int indent = 1;
 		getline(cin, value);
-		Node* dl = new Node(value, 1);
-		//continue to enter data :
-		int methodType = 1;
-		while (methodType != 2) {
-			cout << "\n\t\t choose an item :\n\n\t1-add property\n\t2-add data\n\n>> ";
-			cin >> methodType;
-			if (methodType == 1) {
-				cout << "\n adding property : enter a title : ";
-				cin.ignore();
-				getline(cin, value);
-				dl->setLastDLink(dl, value, 1);
-			}
-			else
-			{
-				cout << "\n\tadding data \n\t: enter a title : ";
-				cin.ignore();
-				getline(cin, value);
-				dl->setLastDLink(dl, value, 2);
-			}
-		}
+		Node* dl = new Node(value, 1, indent);
 		updateGlobalList(GlobalList.getFirst(), dl, name);
 	}
-
 	else {
-		Stack Layers = Stack();
-		Node* _currentLayer = instance;
-		string method = "0";
-		while (method != "1")
-		{
-			cout << "\n\t\t adding property \n\t\t( select an layer or Enter (1) for adding in current layer\nlayers: \n";
-			_currentLayer->showLayer();
-			getline(cin, method);
-			if (method == "1") {
+		//?showing the contact tree 
+		_showContactTree(GlobalList.getFirst(), instance->getValue());
+		//? choosing the location in tree to add property .
+		cout << "\n\t\tenter the name of the parent : ";
+		string loc;
+		getline(cin, loc);
 
-				//do somthing 
-				break;
-			}
+		//?creat new property 
+		cout << "\n\t\tadding first property\n\n";
+		cout << "\n\tChoose a title :  ";
+		string value;
+		getline(cin, value);
+		//add to instance
+		instance->AddPropertyFeature(instance->getDLink(), value, loc);
 
-			_currentLayer = _currentLayer->getNextLayer(_currentLayer, method);
-			Layers._PushLayerToStack(_currentLayer);
-
-		}
+		updateGlobalList(GlobalList.getFirst(), instance->getDLink(), name);
 
 	}
-
 }
+int _deleteFromFile() {	//*deleteFromFile Function ---> delete All data from File and get ready for updateFile Function 
 
-int _deleteFromFile() {
-	//*deleteFromFile Function ---> delete All data from File and get ready for updateFile Function 
 	// Passed ^^^
 	fstream ofs;
 	ofs.open(FilePath, ios::out | ios::trunc);
 	ofs.close();
 	return 0;
 }
-
 int _updateFile(Node* list) {
-	//ofstream openfile(FilePath, ios::app);
-	//passed ^^^
 
 	if (list == NULL)
 	{
 		cout << "\nEnd of list ...\n ";
 		return 1;
 	}
-	//priter function --> print all the elements in global list with specefic form . 
 	Node* inc = list;
 	string value = inc->getValue();
 	if (inc != NULL) {
@@ -475,13 +505,19 @@ int _updateFile(Node* list) {
 			_updateFile(inc->getDLink());
 		}
 		else if (inc->getType() == 1) {
+			int  indent = inc->getIndent();
 			ofstream openfile(FilePath, ios::app);
-			openfile << " - property : " << value << endl; openfile.close();
+			for (int i = 1; i <= indent; i++)
+				openfile << "\t";
+			openfile << "- property : " << value << endl; openfile.close();
 			_updateFile(inc->getDLink());
 		}
 		else if (inc->getType() == 2) {
+			int  indent = inc->getIndent();
 			ofstream openfile(FilePath, ios::app);
-			openfile << " - data : " << value << endl; openfile.close();
+			for (int i = 1; i <= indent; i++)
+				openfile << "\t";
+			openfile << "- data : " << value << endl; openfile.close();
 		}
 	}
 	if (inc->getNext()) {
@@ -489,11 +525,9 @@ int _updateFile(Node* list) {
 	}
 
 }
-
 //-------------------------------------
 int main() {
 	_filler();
+	_addPropOnly();
 	_printerAll(GlobalList.getFirst());
-	cout << "\n-----------------------------\n";
-
 }
