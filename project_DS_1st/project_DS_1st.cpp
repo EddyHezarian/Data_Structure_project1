@@ -358,16 +358,16 @@ public:
 		return false;
 	}
 	 //pop methods --->
-	/*void pop() {
+	void pop() {
 		Node* inc = this->top;
 		Node* inc2 = this->firstNode;
 		while (inc2->next != inc)
 			inc2 = inc2->next;
-		this->top = inc2;
 		this->top->next = NULL;
+		this->top = inc2;
 		delete(inc); 
 		size--;
-	}*/
+	}
 };
 //! global list var here-----------------------------
 Stack GlobalList = Stack();
@@ -672,6 +672,7 @@ void LayerStylePrintStack(Stack stack){
 		cout << inc->getValue()<<endl; 
 		inc = inc->getNext();
 	}
+	exit(0);
 }
 int _search(Node* list, string item , Stack stack ) {//*priter function --> print all the elements in global list with specefic form .
 	if (list == NULL)
@@ -684,23 +685,32 @@ int _search(Node* list, string item , Stack stack ) {//*priter function --> prin
 	if (inc != NULL) {
 		if (inc->getType() == 0) {
 			//clear list 
+			stack.deleteList();
 			// push head 
-			cout << " - contact : " << value << endl;
-			_search(inc->getDLink(),item );
+			Node* tmp = new Node(inc->getValue(), 0, 0);
+			stack._addHeadToStack(tmp);
+			//cout << " - contact : " << value << endl;
+			_search(inc->getDLink(),item, stack);
 		}
 		else if (inc->getType() == 1) {
 			// push head 
-			cout << " - property : " << value << endl;
-			_search(inc->getDLink(),item);
+			Node* tmp = new Node(inc->getValue(),1 , inc->getIndent());
+			stack._addHeadToStack(tmp);
+			_search(inc->getDLink(),item, stack);
 		}
 		else if (inc->getType() == 2) {
-			//if found item -> push head
-			// else -> if inc.nxt = null -> pop 
-			cout << " - data : " << value << endl;
+			if (inc->getValue() == item) {
+				Node* tmp = new Node(inc->getValue(), 2, inc->getIndent());
+				stack._addHeadToStack(tmp);
+				LayerStylePrintStack(stack);
+			}
+			else {
+				if (inc->getNext() == NULL) { }
+			}				
 		}
 	}
 	if (inc->getNext()) {
-		_search(inc->getNext(),item);
+		_search(inc->getNext(),item, stack);
 	}
 
 }
@@ -846,7 +856,7 @@ int main() {
 			cout << "enter the item name for search >> ";
 			cin.ignore();
 			getline(cin, value);
-			_search(GlobalList.getFirst() , value);
+			_search(GlobalList.getFirst() , value, stack);
 			cout << "ayyyyyy kiiii ";
 
 			//print stack 
