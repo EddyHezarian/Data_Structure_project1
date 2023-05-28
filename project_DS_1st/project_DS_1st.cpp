@@ -73,7 +73,7 @@ public:
 				_addProp(inc->next, prop, parent);
 		}
 	}
-	void AddPropertyFeature(Node* node, string value, string parent)
+	void AddPropertyFeature(Node* node, string value, string parent, bool option)
 	{
 		Node* inc = node;
 		if (inc == NULL)
@@ -84,41 +84,50 @@ public:
 		{
 			if (inc->value == parent)
 			{
-
-				if (inc->dlink == NULL)
-				{
-					Node* item = new Node(value, 1, inc->indent + 1);
-					inc->dlink = item;
+				if (option == true) {
+					Node* item = new Node(value, 1, inc->indent );
+					inc->setNext(item);
 				}
 				else {
-					if (inc->dlink->type == 2)
+					if (inc->dlink == NULL)
 					{
-
-						if (inc->next == NULL)
-						{
-							Node* item = new Node(value, 1, inc->indent);
-							inc->next = item;
-						}
-
-						else
-						{
-							Node* item = new Node(value, 1, inc->indent);
-							item->next = inc->next;
-							inc->next = item;
-						}
-					}
-					else {
 						Node* item = new Node(value, 1, inc->indent + 1);
 						inc->dlink = item;
 					}
+					else {
+						if (inc->dlink->type == 2)
+						{
+
+							if (inc->next == NULL)
+							{
+								Node* item = new Node(value, 1, inc->indent);
+								inc->next = item;
+							}
+
+							else
+							{
+								Node* item = new Node(value, 1, inc->indent);
+								item->next = inc->next;
+								inc->next = item;
+							}
+						}
+						else {
+							Node* item = new Node(value, 1, inc->indent + 1);
+							inc->dlink = item;
+						}
+					}
 				}
 			}
+			
+			
+			
+			
 			if (inc->type == 1)
 			{
-				AddPropertyFeature(inc->dlink, value, parent);
+				AddPropertyFeature(inc->dlink, value, parent,option);
 			}
 			else if (inc->type == 2) {
-				AddPropertyFeature(inc->next, value, parent);
+				AddPropertyFeature(inc->next, value, parent, option);
 			}
 		}
 	}
@@ -438,22 +447,21 @@ int indentCounterFUNC(string str) {
 	return indents - 1;
 }
 int _menu() {
+	int i;
 	system("Cls");
 	cout << "\n\t\t Contact APP\n--------choose an option:--------\n\n\t1 - print All List\n\t2 - add contact\n\t3 - show a contact info\n\t4 - add property to contact\n\t5 - add data to contact\n";
 	cout << "\t6 - delete List\n\t7 - delete item\n\t8 - search item \n\t 9 - exit\n\n>>  ";
-
-	int numb = 0;
-	cin >> numb;
-	return numb;
+	cin >> i;
+	return i;
 }
 void LayerStylePrintStack(Stack stack) {
 	Node* inc = stack.getFirst();
-	int indent = 0;
+	int indent = inc->getIndent();
 	while (inc)
 	{
-		for (int j = 0; j < indent; j++)
+		int indent = inc->getIndent();
+		for (int j = 1; j <= indent; j++)
 			cout << "\t";
-		indent++;
 		cout << inc->getValue() << endl;
 		inc = inc->getNext();
 	}
@@ -496,14 +504,13 @@ void _filler() {
 		}
 	}
 	GlobalList.getTop()->setDLink(DLStack.getFirst());
-	Node* ee = GlobalList.getFirst();
 }
 int _printerAll(Node* list) {
 	//*priter function --> print all the elements in global list with specefic form .
 	if (list == NULL)
 	{
 		cout << "\nEnd of list ...\n ";
-		exit(0);
+		return 1;
 	}
 	Node* inc = list;
 	string value = inc->getValue();
@@ -519,6 +526,7 @@ int _printerAll(Node* list) {
 			for (int i = 1; i <= indent; i++)
 				cout << "\t";
 			cout << " - property : " << value << endl;
+			if(inc->getDLink()!= NULL)
 			_printerAll(inc->getDLink());
 		}
 		else if (inc->getType() == 2) {
@@ -554,7 +562,6 @@ void _showContactTree(Node* list, string name) {
 		PrintContactTree(inc->getDLink());
 		system("pause");
 	}
-	system("pause");
 }
 void _Addcontact() {
 	//*addContact Function ---> creat a single contact with single property and data . 
@@ -612,15 +619,23 @@ void _addPropOnly() {
 		cout << "\n\t\tenter the name of the parent : ";
 		string loc;
 		getline(cin, loc);
-
+		cout << "place as Next of Property ?\n\t\t1- yes\n\t\t2-NO\n>> ";
+		int option ;
+		bool flag = false ;
+			cin >> option;
+			if (option == 1 )
+				flag = true;	
 		//?creat new property 
 		cout << "\n\t\tadding first property\n\n";
 		cout << "\n\tChoose a title :  ";
+		cin.ignore();
 		string value;
 		getline(cin, value);
 		//add to instance
-		instance->AddPropertyFeature(instance->getDLink(), value, loc);
-
+		if(flag)
+		instance->AddPropertyFeature(instance->getDLink(), value, loc,true);
+		else 
+			instance->AddPropertyFeature(instance->getDLink(), value, loc, false);
 		updateGlobalList(GlobalList.getFirst(), instance->getDLink(), name);
 
 	}
@@ -714,7 +729,7 @@ int _search(Node* list, string item, Stack stack) {
 	if (list == NULL)
 	{
 		cout << "\nitem not fount\n ";
-		exit(0);
+		return 1;
 	}
 	Node* inc = list;
 	string value = inc->getValue();
@@ -798,23 +813,27 @@ int _updateFile(Node* list, int size) {
 		_updateFile(inc->getNext(), size);
 	}
 }
-//-------------------------------------
+//------------------------------------
 int main() {
 	_filler();
+	int menuOption;
 	while (true)
 	{
-		int menuOption = _menu();
+		system("color F0");
+		menuOption = _menu();
+		
 		switch (menuOption)
 		{
 		case 1: { //* print ALL LIST 
 			system("CLs");
-			system("COLOR 02");
+			system("COLOR F2");
 			cout << "\n\tPrint ALL List\n\n";
-			_printerAll(GlobalList.getFirst()); break;
+			_printerAll(GlobalList.getFirst()); 
+			system("pause");break;
 		}
 		case 2: { //? Add CONTACT
 			system("CLs");
-			system("COLOR 81");
+			system("COLOR F1");
 			cout << "\n\tAdd Contact\n\n";
 			_Addcontact();
 			_deleteFromFile();
@@ -822,7 +841,7 @@ int main() {
 		}
 		case 3: { //* print CONTACT INFO
 			system("CLS");
-			system("COLOR 02");
+			system("COLOR FA");
 			cout << "\n\tPrint contact Info\n\n";
 			cout << "\tEnter the contact name : ";
 			string name;
@@ -833,25 +852,30 @@ int main() {
 			while (true)
 			{
 				if (name == inc->getValue()) {
+					system("CLS");
+					cout << name<<"\n";
 					_showContactTree(GlobalList.getFirst(), name);
+					cout << "\n\n\n";
 					break;
 				}
 
 				if (inc->getNext() != NULL)
 					inc = inc->getNext();
 				else {
-					cout << "\n\tcontact not Found ... try again\n\tname of contact : ";
+					cout << "\n\tcontact not Found ... try again\n\n\tname of contact : ";
 					//cin.ignore();
 					getline(cin, name);
+					if (name == "EXT")break;
 					cout << endl;
 					inc = GlobalList.getFirst();
 				}
 			}
-			_showContactTree(GlobalList.getFirst(), name); break;
+			//_showContactTree(GlobalList.getFirst(), name);
+			break;
 		}
 		case 4: { //? add PROPERTY
 			system("CLs");
-			system("COLOR 81");
+			system("COLOR F1");
 			cout << "\n\tAdd Property\n\n";
 			_addPropOnly();
 			_deleteFromFile();
@@ -860,7 +884,7 @@ int main() {
 		}
 		case 5: { //? add DATA
 			system("CLs");
-			system("COLOR 81");
+			system("COLOR F1");
 			cout << "\n\tAdd Data\n\n";
 			_addDataOnly();
 			_deleteFromFile();
@@ -869,7 +893,7 @@ int main() {
 		}
 		case 6: { //! delete LIST 
 			system("CLs");
-			system("COLOR 04");
+			system("COLOR F4");
 			cout << "\n\tDelete All List \n\n";
 			_deleteAll();
 			_deleteFromFile();
@@ -878,7 +902,7 @@ int main() {
 		case 7: { //! delete ITEM
 
 			system("CLs");
-			system("COLOR 04");
+			system("COLOR F4");
 			cout << "\n\tDelete an Item\n\n";
 			_deleteItem();
 			_deleteFromFile();
@@ -887,7 +911,7 @@ int main() {
 		}
 		case 8: { //* print SEARCHED DATA
 			system("CLs");
-			system("COLOR 0A");
+			system("COLOR FA");
 			cout << "\n\tsearch item\n\n";
 			cout << "-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_\n";
 			Stack  stack = Stack();
@@ -909,10 +933,8 @@ int main() {
 			system("CLs");
 			system("COLOR 04");
 			cout << "\n\n\t\toption not found ";
-			system("pause");
+			system("pause"); break;
 		}
 		}
 	}
-
-
 }
